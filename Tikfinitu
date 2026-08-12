@@ -1,0 +1,565 @@
+-- LocalScript
+-- StarterPlayer > StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local SoundService = game:GetService("SoundService")
+
+local player = Players.LocalPlayer
+
+local KEY = "fuegi005"
+
+local sonidos = {
+	Explode = "165969964",
+	Chiquito = "6837069420"
+}
+
+local canciones = {
+	"85178204496190",
+	"109159861086023",
+	"137042534442974",
+	"71605273550025",
+	"124522962091751",
+	"131121481938105",
+	"114815589658182",
+	"103331394859761",
+	"127547136264774",
+	"92852764977093",
+	"90510691347372",
+	"111830642213484",
+	"99871302045394"
+}
+
+local ANIMATION_ID = "TU_ANIMATION_ID"
+
+local ultimaCancion = 0
+local discoSonido = nil
+local baileTrack = nil
+local lucesDisco = {}
+
+--------------------------------------------------
+-- GUI
+--------------------------------------------------
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TrucosGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+--------------------------------------------------
+-- SONIDOS
+--------------------------------------------------
+
+local function reproducirSonido(id)
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://" .. id
+	sound.Volume = 1
+	sound.Parent = SoundService
+	sound:Play()
+
+	sound.Ended:Connect(function()
+		if sound.Parent then
+			sound:Destroy()
+		end
+	end)
+end
+
+--------------------------------------------------
+-- KEY
+--------------------------------------------------
+
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.fromOffset(300,180)
+keyFrame.Position = UDim2.new(0.5,-150,0.5,-90)
+keyFrame.BackgroundColor3 = Color3.fromRGB(0,100,255)
+keyFrame.Parent = gui
+
+Instance.new("UICorner",keyFrame).CornerRadius = UDim.new(0,15)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,45)
+title.BackgroundTransparency = 1
+title.Text = "🔑 KEY"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = keyFrame
+
+local keyBox = Instance.new("TextBox")
+keyBox.Size = UDim2.new(1,-30,0,45)
+keyBox.Position = UDim2.fromOffset(15,55)
+keyBox.PlaceholderText = "Escribe la clave"
+keyBox.Text = ""
+keyBox.TextScaled = true
+keyBox.ClearTextOnFocus = false
+keyBox.Parent = keyFrame
+
+local enter = Instance.new("TextButton")
+enter.Size = UDim2.new(1,-30,0,45)
+enter.Position = UDim2.fromOffset(15,115)
+enter.Text = "DESBLOQUEAR"
+enter.TextScaled = true
+enter.Font = Enum.Font.GothamBold
+enter.BackgroundColor3 = Color3.fromRGB(0,200,80)
+enter.TextColor3 = Color3.new(1,1,1)
+enter.Parent = keyFrame
+
+Instance.new("UICorner",enter).CornerRadius = UDim.new(0,10)
+
+--------------------------------------------------
+-- BOTÓN TRUCOS
+--------------------------------------------------
+
+local abrir = Instance.new("TextButton")
+abrir.Size = UDim2.fromOffset(120,50)
+abrir.Position = UDim2.new(0.5,-60,0,20)
+abrir.BackgroundColor3 = Color3.fromRGB(210,0,0)
+abrir.Text = "🔴 TRUCOS"
+abrir.TextColor3 = Color3.new(1,1,1)
+abrir.TextScaled = true
+abrir.Font = Enum.Font.GothamBold
+abrir.Visible = false
+abrir.Parent = gui
+
+Instance.new("UICorner",abrir).CornerRadius = UDim.new(0,12)
+
+--------------------------------------------------
+-- PANEL
+--------------------------------------------------
+
+local panel = Instance.new("Frame")
+panel.Size = UDim2.fromOffset(580,150)
+panel.Position = UDim2.new(0.5,-290,0,80)
+panel.BackgroundColor3 = Color3.fromRGB(0,100,255)
+panel.Visible = false
+panel.Parent = gui
+
+Instance.new("UICorner",panel).CornerRadius = UDim.new(0,15)
+
+local mover = Instance.new("TextButton")
+mover.Size = UDim2.new(1,0,0,25)
+mover.BackgroundColor3 = Color3.fromRGB(0,70,190)
+mover.Text = "☰ MOVER PANEL"
+mover.TextColor3 = Color3.new(1,1,1)
+mover.TextScaled = true
+mover.Parent = panel
+
+--------------------------------------------------
+-- BOTONES
+--------------------------------------------------
+
+local function crearBoton(texto,x,color)
+	local boton = Instance.new("TextButton")
+	boton.Size = UDim2.fromOffset(100,65)
+	boton.Position = UDim2.fromOffset(x,35)
+	boton.BackgroundColor3 = color
+	boton.TextColor3 = Color3.new(1,1,1)
+	boton.Text = texto
+	boton.TextScaled = true
+	boton.Font = Enum.Font.GothamBold
+	boton.Parent = panel
+
+	Instance.new("UICorner",boton).CornerRadius = UDim.new(0,12)
+
+	return boton
+end
+
+--------------------------------------------------
+-- CHIQUITO
+--------------------------------------------------
+
+local chico = crearBoton(
+	"🐥\nCHIQUITO",
+	10,
+	Color3.fromRGB(0,150,255)
+)
+
+chico.Activated:Connect(function()
+
+	reproducirSonido(sonidos.Chiquito)
+
+	local character = player.Character
+	if not character then return end
+
+	local original = character:GetScale()
+
+	character:ScaleTo(0.5)
+
+	task.delay(3,function()
+		if character and character.Parent then
+			character:ScaleTo(original)
+		end
+	end)
+
+end)
+
+--------------------------------------------------
+-- EXPLODE
+--------------------------------------------------
+
+local explode = crearBoton(
+	"💥\nEXPLODE",
+	120,
+	Color3.fromRGB(220,40,40)
+)
+
+explode.Activated:Connect(function()
+
+	reproducirSonido(sonidos.Explode)
+
+	local character = player.Character
+	if not character then return end
+
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	local explosion = Instance.new("Explosion")
+	explosion.Position = root.Position
+	explosion.BlastRadius = 0
+	explosion.BlastPressure = 0
+	explosion.DestroyJointRadiusPercent = 0
+	explosion.Parent = workspace
+
+end)
+
+--------------------------------------------------
+-- DISCO
+--------------------------------------------------
+
+local disco = crearBoton(
+	"🪩\nDISCO",
+	230,
+	Color3.fromRGB(160,0,220)
+)
+
+local function limpiarDisco()
+
+	if discoSonido then
+		discoSonido:Stop()
+		discoSonido:Destroy()
+		discoSonido = nil
+	end
+
+	if baileTrack then
+		baileTrack:Stop()
+		baileTrack:Destroy()
+		baileTrack = nil
+	end
+
+	for _,dato in ipairs(lucesDisco) do
+		if dato.part then
+			dato.part:Destroy()
+		end
+	end
+
+	table.clear(lucesDisco)
+
+end
+
+local function crearLucesDisco(root)
+
+	table.clear(lucesDisco)
+
+	for i = 1,4 do
+
+		local part = Instance.new("Part")
+		part.Size = Vector3.new(0.5,0.5,0.5)
+		part.Transparency = 1
+		part.Anchored = true
+		part.CanCollide = false
+		part.CanTouch = false
+		part.CanQuery = false
+		part.Parent = workspace
+
+		local luz = Instance.new("PointLight")
+		luz.Brightness = 8
+		luz.Range = 18
+		luz.Parent = part
+
+		table.insert(lucesDisco,{
+			part = part,
+			luz = luz
+		})
+
+	end
+
+	task.spawn(function()
+
+		local tiempo = 0
+
+		while discoSonido
+			and discoSonido.Parent
+			and discoSonido.IsPlaying do
+
+			tiempo += 0.08
+
+			for i,dato in ipairs(lucesDisco) do
+
+				if dato.part and dato.part.Parent then
+
+					local angulo =
+						tiempo * 2 + i * math.pi / 2
+
+					dato.part.Position =
+						root.Position +
+						Vector3.new(
+							math.cos(angulo) * 6,
+							3 + math.sin(tiempo * 2 + i),
+							math.sin(angulo) * 6
+						)
+
+					dato.luz.Color =
+						Color3.fromHSV(
+							(tiempo * 0.25 + i * 0.25) % 1,
+							1,
+							1
+						)
+
+				end
+
+			end
+
+			task.wait(0.08)
+
+		end
+
+	end)
+
+end
+
+disco.Activated:Connect(function()
+
+	if discoSonido and discoSonido.IsPlaying then
+		return
+	end
+
+	local character = player.Character
+	if not character then return end
+
+	local humanoid =
+		character:FindFirstChildOfClass("Humanoid")
+
+	local root =
+		character:FindFirstChild("HumanoidRootPart")
+
+	if not humanoid or not root then return end
+
+	local indice
+
+	repeat
+		indice = math.random(1,#canciones)
+	until #canciones == 1 or indice ~= ultimaCancion
+
+	ultimaCancion = indice
+
+	discoSonido = Instance.new("Sound")
+	discoSonido.SoundId =
+		"rbxassetid://" .. canciones[indice]
+
+	discoSonido.Volume = 1
+	discoSonido.Looped = false
+	discoSonido.Parent = SoundService
+
+	crearLucesDisco(root)
+
+	-- Baile durante 3 segundos
+	if ANIMATION_ID ~= "TU_ANIMATION_ID" then
+
+		local animator =
+			humanoid:FindFirstChildOfClass("Animator")
+
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = humanoid
+		end
+
+		local anim = Instance.new("Animation")
+		anim.AnimationId =
+			"rbxassetid://" .. ANIMATION_ID
+
+		local correcto,track =
+			pcall(function()
+				return animator:LoadAnimation(anim)
+			end)
+
+		if correcto and track then
+
+			baileTrack = track
+			baileTrack.Looped = false
+			baileTrack:Play()
+
+			task.delay(3,function()
+
+				if baileTrack then
+					baileTrack:Stop()
+					baileTrack:Destroy()
+					baileTrack = nil
+				end
+
+			end)
+
+		end
+
+	end
+
+	discoSonido:Play()
+
+	discoSonido.Ended:Connect(function()
+		limpiarDisco()
+	end)
+
+end)
+
+--------------------------------------------------
+-- STOP
+--------------------------------------------------
+
+local stopDisco = crearBoton(
+	"⏹\nSTOP",
+	340,
+	Color3.fromRGB(50,50,50)
+)
+
+stopDisco.Activated:Connect(function()
+	limpiarDisco()
+end)
+
+--------------------------------------------------
+-- ROCKET
+--------------------------------------------------
+
+local rocket = crearBoton(
+	"🚀\nROCKET",
+	450,
+	Color3.fromRGB(255,90,0)
+)
+
+rocket.Activated:Connect(function()
+
+	local character = player.Character
+	if not character then return end
+
+	local root =
+		character:FindFirstChild("HumanoidRootPart")
+
+	if not root then return end
+
+	-- Subir
+	root.AssemblyLinearVelocity =
+		Vector3.new(0,120,0)
+
+	-- Explosión visual después de subir
+	task.delay(1.2,function()
+
+		if not character.Parent then return end
+
+		local explosion = Instance.new("Explosion")
+
+		explosion.Position = root.Position
+		explosion.BlastRadius = 0
+		explosion.BlastPressure = 0
+		explosion.DestroyJointRadiusPercent = 0
+		explosion.Parent = workspace
+
+	end)
+
+end)
+
+--------------------------------------------------
+-- ABRIR / CERRAR
+--------------------------------------------------
+
+abrir.Activated:Connect(function()
+
+	panel.Visible = not panel.Visible
+
+	if panel.Visible then
+		abrir.Text = "CERRAR"
+	else
+		abrir.Text = "🔴 TRUCOS"
+	end
+
+end)
+
+--------------------------------------------------
+-- MOVER PANEL
+--------------------------------------------------
+
+local moviendo = false
+local inicio
+local posicionInicial
+
+mover.InputBegan:Connect(function(input)
+
+	if input.UserInputType ==
+		Enum.UserInputType.Touch
+		or input.UserInputType ==
+		Enum.UserInputType.MouseButton1 then
+
+		moviendo = true
+		inicio = input.Position
+		posicionInicial = panel.Position
+
+	end
+
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+
+	if not moviendo then return end
+
+	if input.UserInputType ==
+		Enum.UserInputType.Touch
+		or input.UserInputType ==
+		Enum.UserInputType.MouseMovement then
+
+		local delta =
+			input.Position - inicio
+
+		panel.Position = UDim2.new(
+			posicionInicial.X.Scale,
+			posicionInicial.X.Offset + delta.X,
+			posicionInicial.Y.Scale,
+			posicionInicial.Y.Offset + delta.Y
+		)
+
+	end
+
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+
+	if input.UserInputType ==
+		Enum.UserInputType.Touch
+		or input.UserInputType ==
+		Enum.UserInputType.MouseButton1 then
+
+		moviendo = false
+
+	end
+
+end)
+
+--------------------------------------------------
+-- KEY
+--------------------------------------------------
+
+enter.Activated:Connect(function()
+
+	if keyBox.Text == KEY then
+
+		keyFrame.Visible = false
+		abrir.Visible = true
+
+	else
+
+		title.Text = "❌ KEY INCORRECTA"
+		keyBox.Text = ""
+
+		task.wait(1)
+
+		title.Text = "🔑 KEY"
+
+	end
+
+end)
